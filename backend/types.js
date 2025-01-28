@@ -1,15 +1,19 @@
-const zod=require("zod")
+const zod = require("zod");
 
-create createTodo=zod.object{{
-    title:zod.string(),
-    description:zod.string()
-}}
+// Schema for creating a TODO
+const createTodo = zod.object({
+    title: zod.string().min(1, "Title is required"),
+    description: zod.string().min(1, "Description is required"),
+});
 
-const updateTodo=zod.object{{
-    id:zod.string
-}}
+// Schema for updating a TODO
+const updateTodo = zod.object({
+    id: zod.string().min(1, "ID is required"),
+    title: zod.string().optional(), // Optional for updates
+    description: zod.string().optional(), // Optional for updates
+});
 
-module.exports={
-    createTodo:createTodo,
-    updateTodo:updateTodo
-}
+module.exports = {
+    createTodo,
+    updateTodo,
+};
