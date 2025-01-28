@@ -13,6 +13,14 @@ app.post("/todo", (req, res) => {
     res.send("Response");
 });
 
+app.get("/todos", (req,res)=> {
+
+});
+
+app.put("./completed",(req,res) => {
+    
+})
+
 // Start the server
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
