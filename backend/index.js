@@ -2,15 +2,16 @@ const express = require("express");
 const { createTodo, updateTodo } = require("./types"); // Importing Zod schemas
 const { Todo } = require("./db"); // Importing Mongoose model
 const app = express();
-
+const cors=require("cors")
 app.use(express.json());
+app.use(cors());
 
 // GET route - Health check
 app.get("/", (req, res) => {
     res.send("Server is Running");
 });
 
-// POST route - Create a new TODO
+// ✅ Create a new TODO
 app.post("/todo", async (req, res) => {
     const createPayload = req.body;
     const parsePayload = createTodo.safeParse(createPayload);
@@ -23,7 +24,7 @@ app.post("/todo", async (req, res) => {
     }
 
     try {
-        await Todo.create({
+        const newTodo = await Todo.create({
             title: createPayload.title,
             description: createPayload.description,
             completed: false,
@@ -31,6 +32,7 @@ app.post("/todo", async (req, res) => {
 
         res.status(201).json({
             msg: "Todo Created",
+            todo: newTodo, // ✅ Return created todo
         });
     } catch (error) {
         res.status(500).json({
@@ -40,7 +42,7 @@ app.post("/todo", async (req, res) => {
     }
 });
 
-// GET route - Fetch all TODOs
+// ✅ Fetch all TODOs
 app.get("/todos", async (req, res) => {
     try {
         const todos = await Todo.find({});
@@ -53,23 +55,23 @@ app.get("/todos", async (req, res) => {
     }
 });
 
-// PUT route - Mark TODO as completed
-app.put("/completed", async (req, res) => {
-    const updatePayload = req.body;
-    const parsePayload = updateTodo.safeParse(updatePayload);
+// ✅ Mark TODO as completed
+app.put("/todo/:id", async (req, res) => {
+    const todoId = req.params.id;
+    const parsePayload = updateTodo.safeParse({ id: todoId });
 
     if (!parsePayload.success) {
         return res.status(400).json({
             msg: "You sent the wrong inputs",
-            errors: parsePayload.error.errors, // Zod validation errors
+            errors: parsePayload.error.errors,
         });
     }
 
     try {
         const updatedTodo = await Todo.findByIdAndUpdate(
-            updatePayload.id,
+            todoId,
             { completed: true },
-            { new: true } // Return the updated document
+            { new: true } // ✅ Return the updated document
         );
 
         if (!updatedTodo) {
@@ -90,7 +92,7 @@ app.put("/completed", async (req, res) => {
     }
 });
 
-// Start the server
+// ✅ Start the server
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
